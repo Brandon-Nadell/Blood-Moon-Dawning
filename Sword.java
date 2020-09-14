@@ -3,6 +3,7 @@ package com.mygdx.game.item.weapon;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.*;
 import com.mygdx.game.Realms.Dir;
+import com.mygdx.game.Room.Handicap.Check;
 import com.mygdx.game.TintedTexture.Model;
 import com.mygdx.game.effects.SwordAnimation;
 import com.mygdx.game.item.gear.*;
@@ -47,11 +48,18 @@ public class Sword extends CombatGear implements Weaponizable {
 	}
 	
 	public void use(float xDir, float yDir) {
-		if (canUse() && testHandicap(1)) {
+		if (canUse() && testHandicap(Check.MELEE)) {
 			resetCooldown();
 			stats().setDir(xDir, yDir);
 			Powerball pb = getOwner().get(Powerball.class);
-			Realms.getGame().getRoom().addEffect(new SwordAnimation(this, Dir.VECTOR.to(Dir.ANGLE, Realms.roundVector(new Vector2(xDir, yDir)), Integer.class), pb != null && pb.powerUp() ? pb.getDamage() : 0, SwordAnimation.DURATION_DEFAULT + (int)getOwner().getBadgeValue(Badge.Type.LEVERAGE)));
+			CombatGear item = this;
+			Infuser inf = getOwner().get(Infuser.class);
+			if (inf != null) {
+				item = item.clone();
+				item.setOriginal(item.stats().clone());
+				inf.fuse(item);
+			}
+			Realms.getGame().getRoom().addEffect(new SwordAnimation(item, Dir.VECTOR.to(Dir.ANGLE, Realms.roundVector(new Vector2(xDir, yDir)), Integer.class), pb != null && pb.powerUp() ? pb.getDamage() : 0, SwordAnimation.DURATION_DEFAULT + (int)getOwner().getBadgeValue(Badge.Type.LEVERAGE)));
 			stats().applySpecialUse(getOwner());
 			if (xDir % 1 == 0 && yDir % 1 == 0) {
 				getOwner().setDirection(Realms.dirToIndex((int)xDir, (int)yDir));
