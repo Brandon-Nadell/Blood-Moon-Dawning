@@ -1,6 +1,42 @@
 package com.mygdx.game.item;
 
 import java.util.ArrayList;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.mygdx.game.Audio;
+import com.mygdx.game.Audio.Sounds;
+import com.mygdx.game.Chestable;
+import com.mygdx.game.Essence;
+import com.mygdx.game.Essence.Essences;
+import com.mygdx.game.Game.Window;
+import com.mygdx.game.Graphics;
+import com.mygdx.game.Loot;
+import com.mygdx.game.Realms;
+import com.mygdx.game.Room;
+import com.mygdx.game.Room.Handicap.Check;
+import com.mygdx.game.Text;
+import com.mygdx.game.effects.Light;
+import com.mygdx.game.effects.SwordAnimation.Direction;
+import com.mygdx.game.entity.Creature;
+import com.mygdx.game.entity.Entity;
+import com.mygdx.game.entity.Player;
+import com.mygdx.game.gui.Slot;
+import com.mygdx.game.gui.PauseMenuButton.Option;
+import com.mygdx.game.item.gear.Activatable;
+import com.mygdx.game.item.gear.Badge;
+import com.mygdx.game.item.gear.CombatGear;
+import com.mygdx.game.item.gear.Consumable;
+import com.mygdx.game.item.gear.Link;
+import com.mygdx.game.item.gear.Material;
+import com.mygdx.game.item.gear.Scroll;
+import com.mygdx.game.item.gear.ShieldActive;
+import com.mygdx.game.item.weapon.Bomb;
+import com.mygdx.game.item.weapon.Weaponizable;
+import com.mygdx.game.item.weapon.WindupWeapon;
 
 public class Item extends Entity implements Chestable, Cloneable {
 
