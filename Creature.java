@@ -1,6 +1,32 @@
 package com.mygdx.game.entity;
 
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.mygdx.game.*;
+import com.mygdx.game.Audio.Musics;
+import com.mygdx.game.Audio.Sounds;
+import com.mygdx.game.Essence.Essences;
+import com.mygdx.game.Statistics.Attribute;
+import com.mygdx.game.Statistics.Attribute.Special;
+import com.mygdx.game.Statistics.StatType;
+import com.mygdx.game.Word.Format;
+import com.mygdx.game.ai.*;
+import com.mygdx.game.effects.*;
+import com.mygdx.game.effects.Particle.Type;
+import com.mygdx.game.entity.ModBlock.Modification;
+import com.mygdx.game.entity.Player.Dirs;
+import com.mygdx.game.gui.HealthBar;
+import com.mygdx.game.gui.HealthBar.Display;
+import com.mygdx.game.item.Heart;
+import com.mygdx.game.item.Item;
+import com.mygdx.game.item.Item.Items;
+import com.mygdx.game.item.gear.*;
+import com.mygdx.game.item.gear.ShieldPassive.Shields;
 
 public class Creature extends MovingObject {
 	
