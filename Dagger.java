@@ -4,6 +4,7 @@ import com.mygdx.game.entity.*;
 import com.mygdx.game.entity.MovingObject.MovingObjects;
 import com.mygdx.game.*;
 import com.mygdx.game.Audio.Sounds;
+import com.mygdx.game.Room.Handicap.Check;
 import com.mygdx.game.Statistics.StatType;
 import com.mygdx.game.TintedTexture.Model;
 import com.mygdx.game.item.gear.*;
@@ -46,7 +47,7 @@ public class Dagger extends CombatGear implements Weaponizable {
 	}
 	
 	public void use(float xDir, float yDir) {
-		if (canUse() && testHandicap(2)) {
+		if (canUse() && testHandicap(Check.RANGE)) {
 			createProjectile(this, xDir, yDir);
 		}
 	}
@@ -55,9 +56,15 @@ public class Dagger extends CombatGear implements Weaponizable {
 		item.resetCooldown();
 		item.unstack();
 		Creature owner = item.getOwner();
-		int width = xDir == 0 ? item.getSmall() : item.getLarge();
-		int	height = yDir == 0 ? item.getSmall() : item.getLarge();
+		int width = (int)((xDir == 0 ? item.getSmall() : item.getLarge())*(1 + item.getOwner().getBadgeValue(Badge.Type.ENLARGEMENT)));
+		int	height = (int)((yDir == 0 ? item.getSmall() : item.getLarge())*(1 + item.getOwner().getBadgeValue(Badge.Type.ENLARGEMENT)));
 		double speed = item.stats().getStat(StatType.SPEED) + owner.getBadgeValue(Badge.Type.TWITCH);
+		Infuser inf = item.getOwner().get(Infuser.class);
+		if (inf != null) {
+			item = item.clone();
+			item.setOriginal(item.stats().clone());
+			inf.fuse(item);
+		}
 		Projectile projectile = new Projectile(owner.getGroup(), 
 			owner.centerX() - width/2 + (int)(xDir*owner.getWidth()),
 			owner.centerY() - height/2 + (int)(yDir*owner.getWidth()), 
