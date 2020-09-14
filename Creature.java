@@ -1,32 +1,6 @@
 package com.mygdx.game.entity;
 
 import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.mygdx.game.*;
-import com.mygdx.game.Audio.Musics;
-import com.mygdx.game.Audio.Sounds;
-import com.mygdx.game.Essence.Essences;
-import com.mygdx.game.Statistics.Attribute;
-import com.mygdx.game.Statistics.Attribute.Special;
-import com.mygdx.game.Statistics.StatType;
-import com.mygdx.game.Word.Format;
-import com.mygdx.game.ai.*;
-import com.mygdx.game.effects.*;
-import com.mygdx.game.effects.Particle.Type;
-import com.mygdx.game.entity.ModBlock.Modification;
-import com.mygdx.game.entity.Player.Dirs;
-import com.mygdx.game.gui.HealthBar;
-import com.mygdx.game.gui.HealthBar.Display;
-import com.mygdx.game.item.Heart;
-import com.mygdx.game.item.Item;
-import com.mygdx.game.item.Item.Items;
-import com.mygdx.game.item.gear.*;
-import com.mygdx.game.item.gear.ShieldPassive.Shields;
 
 public class Creature extends MovingObject {
 	
@@ -69,7 +43,8 @@ public class Creature extends MovingObject {
 	private int zoneRotation; //remaining time of nullZone
 	private boolean trueDamageResistant; //if true, does not take damage that ignores resistance (ex. DOTs)
 	private boolean explosionResistant; //if true, does not take damage from bomb explosions
-	private boolean noLoot; //if true, does not drop loot (including mini-hearts)
+	private boolean noLoot; //if true, does not drop loot (excluding mini-hearts)
+	private boolean noMiniHearts; //if true, does not drop mini-hearts
 	private boolean canGoOffscreen; //if true, is not killed when offscreen
 	public Creature tether;
 	//other
@@ -102,7 +77,7 @@ public class Creature extends MovingObject {
 	}
 	
 	public Creature(MovingObjects type, Group group, int x, int y, int width, int healthMax, double speedBase, Intelligence ai) {
-		this(type, type.texture[(int)(Math.random()*type.texture.length)], group, x, y, width, healthMax, speedBase, ai);
+		this(type, type.texture[(int)(Realms.random()*type.texture.length)], group, x, y, width, healthMax, speedBase, ai);
 	}
 	
 	public Creature(MovingObjects type, Group group, int x, int y, int width, int healthMax, double speed, Intelligence ai, Loot loot) {
@@ -112,13 +87,13 @@ public class Creature extends MovingObject {
 	
 	//used only from 5th constructor
 	private Creature(Creatures c, Group group, int x, int y, int width, double speedBase, Intelligence ai) {
-		this(c.types[(int)(Math.random()*c.types.length)], group, x, y, width, c.healthMin*width/c.widthMin, speedBase, ai);
+		this(c.types[(int)(Realms.random()*c.types.length)], group, x, y, width, c.healthMin*width/c.widthMin, speedBase, ai);
 	}
 	
 	public Creature(Creatures c, int x, int y) {
 		this(c, c.wild ? Group.NEUTRAL : Group.FOE, x, y, Realms.random(c.widthMin, c.widthMax), c.speed, c.ai == null ? null : c.ai.clone());
 		setCenterX(x);
-		setCenterY(y);
+		setCenterY(y); 
 		for (int i = 0; i < c.items.length; i++) {
 			addItem(c.items[i].clone());
 		}
@@ -238,9 +213,9 @@ public class Creature extends MovingObject {
 	public void testCollisions(boolean frozen) {
 		//doors
 		Door entering = null;
-		for (Block block : Realms.getGame().getRoom().getBlocks()) {
-			if (this instanceof Player && block instanceof Door && entering(block) && Room.canExit()) {
-				entering = (Door)block;
+		for (Door door : Realms.getGame().getRoom().getDoors()) {
+			if (this instanceof Player && entering(door) && Room.canExit()) {
+				entering = door;
 			}
 		}
 		if (entering != null) {
@@ -325,12 +300,6 @@ public class Creature extends MovingObject {
 			Graphics.begin();
 			Graphics.draw(new TextureRegion(ScreenEffects.GOLDZONE.texture), centerX() - r, centerY() - r, r, r, r*2, r*2, 1, 1, zoneRotation);
 			Graphics.end();
-//			Gdx.gl.glEnable(GL30.GL_BLEND);
-//			Graphics.shapeRenderer.begin(ShapeType.Filled);
-//			Graphics.shapeRenderer.setColor(1f, 1f, 0f, .25f);
-//			Graphics.shapeRenderer.circle(centerX(), centerY(), gold.getRadius());
-//			Graphics.shapeRenderer.end();
-//			Gdx.gl.glDisable(GL30.GL_BLEND);
 		}
 		Magnet magnet = get(Magnet.class);
 		if (magnet != null) {
@@ -338,20 +307,15 @@ public class Creature extends MovingObject {
 			Graphics.begin();
 			Graphics.draw(new TextureRegion(ScreenEffects.MAGNETZONE.texture), centerX() - r, centerY() - r, r, r, r*2, r*2, 1, 1, zoneRotation);
 			Graphics.end();
-//			Gdx.gl.glEnable(GL30.GL_BLEND);
-//			Graphics.shapeRenderer.begin(ShapeType.Filled);
-//			Graphics.shapeRenderer.setColor(1f, 0f, 0f, .25f);
-//			Graphics.shapeRenderer.circle(centerX(), centerY(), magnet.getStrength());
-//			Graphics.shapeRenderer.end();
-//			Gdx.gl.glDisable(GL30.GL_BLEND);
 		}
 		Graphics.resetColor();
-		Color c = color.cpy().lerp(color2.cpy(), .5f);
+		Color c = color2.equals(Color.WHITE) ? color.cpy().lerp(color2.cpy(), .5f) : color.cpy().lerp(color2.cpy(), .85f);
 		Graphics.setColor(c.r, c.g, c.b, c.a*totalA(), true);
 		if (hidden) {
 			Graphics.begin();
-			Graphics.draw(new TextureRegion(new Texture("entity/creature/chest.png")), getX(), getY());
+			Graphics.draw(new TextureRegion(new Texture("entity/creature/chest.png")), getX(), getY(), getWidth(), getHeight());
 			Graphics.end();
+			drawBounds();
 		} else {
 			super.draw();
 		}
@@ -396,6 +360,12 @@ public class Creature extends MovingObject {
 	public boolean offscreenCompletely() {
 		return !canGoOffscreen && super.offscreenCompletely();
 	}
+		
+	public static void lifesteal(Creature attacker, Creature victim, int health) {
+		attacker.changeHealth(health);
+		Realms.getGame().getRoom().addEffect(new Lifesteal(victim, attacker, Color.RED, 20));
+		Audio.play(Sounds.LIFESTEAL, attacker.centerX());
+	}
 	
 	//normal damage
 	public void damage(CombatGear item, Creature victim, boolean force, int damageBoost) {
@@ -409,35 +379,37 @@ public class Creature extends MovingObject {
 			boolean crit = stats.crit(getBadgeValue(Badge.Type.LUCK));
 			if ((victim.canHurt() || force) && victim.hurtCooldown != -1) {
 				double damageWithCrit = stats.getCritDamage(crit, victim.getCritResistance(), 0, damageBoost);
-	//			if (damageWithCrit > 0) {
-					double resistance = victim.getResistance(stats) + victim.getActiveResistance(stats);
-					damage = -damageWithCrit * (1 - Realms.limit(resistance - (!stats.getImmutable(StatType.POTENCY) ? stats.getStat(StatType.POTENCY) : 0), 0, 1));
-					damage *= (1 - compareEssence(item.getEssences(), victim.getEssences()));
-					Shields shieldType = victim.getShieldType();
-					if (shieldType != null) {
-						shieldType.action(victim, -damageWithCrit + damageWithCrit * (1.0 - resistance));
+				double resistance = victim.getResistance(stats) + victim.getActiveResistance(stats);
+				damage = -damageWithCrit * (1 - Realms.limit(resistance - (!stats.getImmutable(StatType.POTENCY) ? stats.getStat(StatType.POTENCY) : 0), 0, 1));
+				damage *= (1 - compareEssence(item.getEssences(), victim.getEssences()));
+				Shields shieldType = victim.getShieldType();
+				if (shieldType != null) {
+					shieldType.action(victim, -damageWithCrit + damageWithCrit * (1.0 - resistance));
+				}
+				if (stats.getAttribute(Special.LOOT) != null) {
+					victim.setLootBoost(stats.getAttribute(Special.LOOT).getValue());
+				}
+				damage = victim.modifyDamage(item, damage);
+				victim.changeHealth((int)(damage*(Realms.random() < victim.getEnchantedFangChance() ? -1 : 1)));
+				if (victim.getHealthbar().getHealth() > 0) {
+					if ((int)damage != 0) {
+						victim.hurt(!force, Color.RED);
 					}
-					if (stats.getAttribute(Special.LOOT) != null) {
-						victim.setLootBoost(stats.getAttribute(Special.LOOT).getValue());
-					}
-					damage = victim.modifyDamage(item, damage);
-					victim.changeHealth((int)(damage*(Math.random() < victim.getLipstickChance() ? -1 : 1)));
-					if (victim.getHealthbar().getHealth() > 0) {
-						if ((int)damage != 0) {
-							victim.hurt(!force, Color.RED);
-						}
-					} else {
-						victim.setShouldDelete(true);
-						Realms.getGame().getRoom().addEffects(Particle.create(Type.DEATH, victim.centerX(), victim.centerY(), 3, 3, 20, victim.getWidth(), false, true));
-					}
-					if (resistance > 0) {
-						Audio.play(Sounds.SHIELD, 0.5f, 0.75f, victim.centerX());
-					}
-					Realms.getGame().getRoom().addEffect(Particle.create(new Text(Integer.toString((int)damage), crit ? Color.GOLD : Color.RED, Format.GRADIENT), victim.centerX(), victim.centerY(), 5, 5, 40));
-	//			}
+				} else {
+					victim.setShouldDelete(true);
+					Realms.getGame().getRoom().addEffects(Particle.create(Type.DEATH, victim.centerX(), victim.centerY(), 3, 3, 20, victim.getWidth(), false, true));
+				}
+				if (resistance > 0) {
+					Audio.play(Sounds.SHIELD, 0.5f, 0.75f, victim.centerX());
+				}
+				Realms.getGame().getRoom().addEffect(Particle.create(new Text(Integer.toString((int)damage), crit ? Color.GOLD : Color.RED, Format.GRADIENT), victim.centerX(), victim.centerY(), 5, 5, 40));
 				victim.setKiller(this);
 				victim.setColor(DamageOverTime.DAMAGE);
 				if (crit) {
+					Radialith radialith = get(Radialith.class);
+					if (radialith != null) {
+						radialith.shock();
+					}
 					Audio.play(Sounds.REFLECT, 1f, 2f, victim.centerX());
 				}
 			}
@@ -473,15 +445,19 @@ public class Creature extends MovingObject {
 	
 	public void kill() {
 		//assess loot
-		if (!noLoot && getType() != MovingObjects.KRAKEN_TENTACLE) {
-			float min = .1f;
-			float max = .3f;
-			double count = min + (Math.random() + getBadgeValue(Badge.Type.BLOODTHIRSTER))*(max - min);
-			for (int i = 0; i < count*healthbar.getHealthMax(); i++) {
-				loot.add(new Loot(new Heart(Heart.Type.HEALTH_MINI, 1, ""), 1, 1, 1, false));
+		if (getType() != MovingObjects.KRAKEN_TENTACLE) {
+			if (!noMiniHearts) {
+				float min = .1f;
+				float max = .3f;
+				double count = min + (Realms.random() + getBadgeValue(Badge.Type.BLOODTHIRSTER))*(max - min);
+				for (int i = 0; i < count*healthbar.getHealthMax(); i++) {
+					new Loot(new Heart(Heart.Type.HEALTH_MINI, 1, ""), 1, 1, 1, false).drop(this, 0);;
+				}
 			}
-			for (Loot loot : loot) {
-				loot.drop(this, lootBoost + (killer == null ? 0 : killer.getBadgeValue(Badge.Type.SCAVENGING)));
+			if (!noLoot) {
+				for (Loot loot : loot) {
+					loot.drop(this, lootBoost + (killer == null ? 0 : killer.getBadgeValue(Badge.Type.SCAVENGING)));
+				}
 			}
 		}
 		//kill message
@@ -524,10 +500,9 @@ public class Creature extends MovingObject {
 			creatureType.kill(this);
 		}
 		Realms.getGame().getRoom().getBlocks().remove(nullZone);
-		if (Realms.getGame().getRoom().getCreatures().isEmpty() && Math.random() < Realms.getGame().getPlayer().getBloodAmuletChance()) {
-			Realms.getGame().getPlayer().changeHealth(Realms.getGame().getPlayer().getBloodAmuletHealth());
-			Particle.circle(Type.DAMAGE, Realms.getGame().getPlayer().centerX(), Realms.getGame().getPlayer().centerY(), 50, 20, -3, Realms.getGame().getRoom());
-			Audio.play(Sounds.LIFESTEAL, centerX());
+		BloodAmulet ba = get(BloodAmulet.class);
+		if (ba != null) {
+			ba.heal();
 		}
 	}
 	
@@ -537,7 +512,7 @@ public class Creature extends MovingObject {
 	
 	public void dash(double x, double y) {
 		addForce((int)x, (int)y);
-		Audio.play(Sounds.FIRE, 1f, .5f, 720);
+		Audio.play(Sounds.FIRE, 1f, .5f, Realms.WIDTH/2);
 	}
 	
 	public void addEssence(Essences essence, int potency) {
@@ -672,7 +647,7 @@ public class Creature extends MovingObject {
 	public double getFireResistance() {
 		try {
 			Attribute attribute = getShield().stats().getAttribute(Special.FIRE_RESISTANCE);
-			if (attribute != null && Math.random() < attribute.getValue()) {
+			if (attribute != null && Realms.random() < attribute.getValue()) {
 				return attribute.getValue();
 			}
 		} catch (NullPointerException e) { }
@@ -744,20 +719,6 @@ public class Creature extends MovingObject {
 		return 0;
 	}
 	
-	public double getBloodAmuletChance() {
-		try {
-			return get(BloodAmulet.class).getChance();
-		} catch (NullPointerException e) { }
-		return 0;
-	}
-	
-	public int getBloodAmuletHealth() {
-		try {
-			return get(BloodAmulet.class).getHealth();
-		} catch (NullPointerException e) { }
-		return 0;
-	}
-	
 	public double getDiffuserChance() {
 		try {
 			return get(Diffuser.class).getChance();
@@ -774,9 +735,9 @@ public class Creature extends MovingObject {
 		return findGear(c);
 	}
 	
-	public double getLipstickChance() {
+	public double getEnchantedFangChance() {
 		try {
-			return get(Lipstick.class).getChance();
+			return get(EnchantedFang.class).getChance();
 		} catch (NullPointerException e) { }
 		return 0;
 	}
@@ -798,6 +759,13 @@ public class Creature extends MovingObject {
 	public Creature setName(String name) {
 		this.name = name;
 		healthbar.setName(name);
+		return this;
+	}
+	
+	public Creature setNameIfNone(String name) {
+		if (this.name == null) {
+			setName(name);
+		}
 		return this;
 	}
 	
@@ -893,8 +861,11 @@ public class Creature extends MovingObject {
 	
 	//damage
 	public void changeHealth(int health) {
-		healthbar.changeHealth(health, centerX(), centerY());
-//		healthbar.changeHealth(health*(Math.random() < getLipstickChance() ? -1 : 1), centerX(), centerY());
+		if (health < 0) {
+			healthbar.changeHealth(health*(Realms.random() < getEnchantedFangChance() ? -1 : 1), centerX(), centerY());
+		} else {
+			healthbar.changeHealth(health, centerX(), centerY());
+		}
 	}
 	
 	public HealthBar getHealthbar() {
@@ -1096,8 +1067,16 @@ public class Creature extends MovingObject {
 		this.explosionResistant = explosionResistant;
 	}
 	
+	public void setNoMiniHearts(boolean noMiniHearts) {
+		this.noMiniHearts = noMiniHearts;
+	}
+	
 	public void setNoLoot(boolean noLoot) {
 		this.noLoot = noLoot;
+	}
+	
+	public boolean getNoMiniHearts() {
+		return noMiniHearts;
 	}
 	
 	public boolean getNoLoot() {
