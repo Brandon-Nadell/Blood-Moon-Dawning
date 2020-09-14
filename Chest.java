@@ -1,17 +1,6 @@
 package com.mygdx.game.entity;
 
 import com.badlogic.gdx.graphics.Color;
-import com.mygdx.game.*;
-import com.mygdx.game.Audio.Sounds;
-import com.mygdx.game.Word.Format;
-import com.mygdx.game.entity.Block.Blocks.Subtype;
-import com.mygdx.game.entity.MovingObject.Group;
-import com.mygdx.game.entity.MovingObject.MovingObjects;
-import com.mygdx.game.item.Item;
-import com.mygdx.game.item.Key.Keys;
-import com.mygdx.game.item.gear.CombatGear;
-import com.mygdx.game.item.gear.Consumable;
-import com.mygdx.game.item.weapon.Bomb;
 
 public class Chest extends LockedBlock {
 	
@@ -145,6 +134,12 @@ public class Chest extends LockedBlock {
 		}
 	}
 	
+	public void draw(boolean frozen) {
+		super.draw(frozen);
+		drawItem();
+		animate(frozen);
+	}
+	
 	public void drawItem() {
 		 if (!open && Realms.getGame().getPlayer().getClairvoyant()) {
 			if (item != null) {
@@ -155,7 +150,7 @@ public class Chest extends LockedBlock {
 			if (explosion != null) {
 //				Projectile.drawAreaIndicator(MovingObjects.BOMB, explosion, centerX(), centerY(), .5f);
 				Word danger = new Word("!", 0, 0, new Color(1f, 0f, 0f, .5f), 60, Format.DEFAULT);
-				danger.render(centerX() - danger.getWidth(), centerY() - 30);
+				danger.render(centerX() - danger.getWidth()/2, centerY() - 30);
 			}
 		}
 	}
