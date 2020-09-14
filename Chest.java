@@ -1,6 +1,17 @@
 package com.mygdx.game.entity;
 
 import com.badlogic.gdx.graphics.Color;
+import com.mygdx.game.*;
+import com.mygdx.game.Audio.Sounds;
+import com.mygdx.game.Word.Format;
+import com.mygdx.game.entity.Block.Blocks.Subtype;
+import com.mygdx.game.entity.MovingObject.Group;
+import com.mygdx.game.entity.MovingObject.MovingObjects;
+import com.mygdx.game.item.Item;
+import com.mygdx.game.item.Key.Keys;
+import com.mygdx.game.item.gear.CombatGear;
+import com.mygdx.game.item.gear.Consumable;
+import com.mygdx.game.item.weapon.Bomb;
 
 public class Chest extends LockedBlock {
 	
