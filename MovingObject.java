@@ -1,6 +1,30 @@
 package com.mygdx.game.entity;
 
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.Audio;
+import com.mygdx.game.Audio.Sounds;
+import com.mygdx.game.Statistics.StatType;
+import com.mygdx.game.Essence;
+import com.mygdx.game.Graphics;
+import com.mygdx.game.Loot;
+import com.mygdx.game.Realms;
+import com.mygdx.game.Room;
+import com.mygdx.game.gui.HealthBar.Display;
+import com.mygdx.game.item.Item;
+import com.mygdx.game.item.gear.CombatGear;
+import com.mygdx.game.item.gear.Consumable;
+import com.mygdx.game.item.weapon.Bomb;
+import com.mygdx.game.item.weapon.Bomb.Ability;
+import com.mygdx.game.item.weapon.Crossbow;
+import com.mygdx.game.item.weapon.Dagger;
+import com.mygdx.game.item.weapon.Hammer;
 
 public abstract class MovingObject extends Entity {
 	
