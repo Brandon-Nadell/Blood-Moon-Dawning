@@ -2,6 +2,8 @@ package com.mygdx.game.entity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -36,7 +38,6 @@ public class Block extends Entity {
 	private Blocks type;
 	private Animation animation;
 	private Subtype subtype;
-//	private float alpha;
 	private Color tint;
 	private Entity[][] shadows;
 	private boolean shadowed;
@@ -55,12 +56,11 @@ public class Block extends Entity {
 		}
 	}
 	
-	public Block(int x, int y, int width, int height, boolean circular, Blocks block, Light light) {
+	public Block(float x, float y, int width, int height, boolean circular, Blocks block, Light light) {
 		super(x, y, width, height, circular, block == null ? null : Realms.toRegion(block.texture));
 		this.solid = true;
 		this.type = block;
 		cracks = new ArrayList<TextureRegion>();
-//		alpha = 1f;
 		tint = new Color(Color.WHITE);
 		if (light != null) {
 			light.setSource(this);
@@ -68,28 +68,28 @@ public class Block extends Entity {
 		}
 	}
 	
-	public Block(int x, int y, int width, int height, boolean circular, Blocks block) {
+	public Block(float x, float y, int width, int height, boolean circular, Blocks block) {
 		this(x, y, width, height, circular, block, null);
 	}
 	
-	public Block(int x, int y, int width, int height, Blocks block, Light light) {
+	public Block(float x, float y, int width, int height, Blocks block, Light light) {
 		this(x, y, width, height, false, block, light);
 	}
 	
-	public Block(int x, int y, int width, int height, Blocks block, TextureRegion sprite) {
+	public Block(float x, float y, int width, int height, Blocks block, TextureRegion sprite) {
 		this(x, y, width, height, false, block);
 		setSprite(sprite);
 	}
 	
-	public Block(int x, int y, int width, int height, boolean circular) {
+	public Block(float x, float y, int width, int height, boolean circular) {
 		this(x, y, width, height, circular, null, null);
 	}
 	
-	public Block(int x, int y, int width, int height, Blocks block) {
+	public Block(float x, float y, int width, int height, Blocks block) {
 		this(x, y, width, height, false, block, null);
 	}
 	
-	public Block(int x, int y, int width, int height) {
+	public Block(float x, float y, int width, int height) {
 		this(x, y, width, height, false, null, null);
 	}
 	
@@ -107,6 +107,8 @@ public class Block extends Entity {
 		WOOD_RED(new Texture("entity/block/material/wood_red.png"), 0, Color.SCARLET, Break.AXE),
 		WOOD_WHITE(new Texture("entity/block/material/wood_white.png"), 0, Color.WHITE, Break.AXE),
 		WOOD_BLACK(new Texture("entity/block/material/wood_black.png"), 0, Color.DARK_GRAY, Break.AXE),
+		WOOD_HARD(new Texture("entity/block/material/wood.png"), 0, Color.TAN),
+		WOOD_DARK_HARD(new Texture("entity/block/material/wood_dark.png"), 0, Color.BROWN),
 		
 		CAVEROCK(new Texture("entity/block/material/caverock.png"), .4, Color.GRAY, Break.EXPLODE),
 		CAVEROCK_BLACK(new Texture("entity/block/material/caverock_black.png"), .4, Color.DARK_GRAY, Break.EXPLODE),
@@ -145,7 +147,6 @@ public class Block extends Entity {
 		SPIKE_S(new Texture("entity/block/material/spikeS.png"), 0),
 		
 		BRICK_WALL(new Texture("entity/block/brick_wall.png"), 0),
-		BRICK_WALL50(new Texture("entity/block/brick_wall50.png"), 0),
 
 		CHEST_WOOD(new Texture("entity/block/chest/chest_wood.png"), 0, Animation.CHEST_WOOD_OPEN),
 		CHEST_WOOD_LIGHT(new Texture("entity/block/chest/chest_wood_light.png"), 0, Animation.CHEST_WOOD_LIGHT_OPEN),
@@ -173,13 +174,12 @@ public class Block extends Entity {
 		COMPRESSOR(new Texture("entity/block/compressor.png"), 0),
 		ALTAR(new Texture("entity/block/altar.png"), 0),
 		
-		DOOR30(new Texture("entity/block/door/door_30.png"), 0),
-//		DOOR_LOCKED(new Texture("entity/block/door_locked.png"), 0),
-		DOOR50(new Texture("entity/block/door/door_50.png"), 0),
-//		DOOR50_LOCKED(new Texture("entity/block/door50_locked.png"), 0),
+		DOOR(new Texture("entity/block/door/door_45.png"), 0),
 		TRAPDOOR(new Texture("entity/block/door/trapdoor.png"), 0),
+		TRAPDOOR_SEALED(new Texture("entity/block/door/trapdoor_sealed.png"), 0),
 		LADDER(new Texture("entity/block/door/ladder.png"), 0),
-		WARP_DOOR(new Texture("entity/block/door/ladder.png"), 0),
+		LADDER_SEALED(new Texture("entity/block/door/ladder_sealed.png"), 0),
+		WARP_DOOR(new Texture("entity/block/door/challenge_door.png"), 0),
 
 		LAMP(new Texture("entity/block/lamp.png"), 0, Color.YELLOW, Break.ICE),
 		TORCH_ORANGE_LEFT(new Texture("entity/block/torch_left.png"), 0) {
@@ -234,6 +234,7 @@ public class Block extends Entity {
 		BLANK(new Texture("screen/blank.png"), 0),
 
 		TARGET(new Texture("entity/block/modblock/move.png"), 2),
+		WEIGHT_PLATE(new Texture("entity/block/weighted_plate.png"), 0),
 		
 		LAVA(new Texture("entity/block/floor/lava.png"), 0),
 		LAVA_C(new Texture("entity/block/floor/lava_c.png"), 0),
@@ -295,14 +296,14 @@ public class Block extends Entity {
 			CAVEROCK(Blocks.CAVEROCK, Blocks.CAVEROCK_BLACK, Blocks.CAVEROCK_RED),
 			;
 			
-			public final Blocks[] variants;
+			public final List<Blocks> variants;
 			
 			private Subtype(Blocks... variants) {
-				this.variants = variants;
+				this.variants = Arrays.asList(variants);
 			}
 			
 			public Blocks random() {
-				return variants[(int)(Math.random()*variants.length)];
+				return Realms.random(variants);
 			}
 		}
 		
@@ -421,9 +422,8 @@ public class Block extends Entity {
 	}
 	
 	public void draw(boolean frozen) {
-		if (!(this instanceof Polygon)) {
+		if (!(this instanceof Polygon) || ((Polygon)this).isSquare()) {
 			Graphics.begin();
-//			Graphics.setColor(new Color(1f, 1f, 1f, alpha), true);
 			Graphics.setColor(tint);
 			draw(getSprite(), rotation);
 			for (TextureRegion crack : cracks) {
@@ -431,10 +431,6 @@ public class Block extends Entity {
 			}
 			Graphics.resetColor();
 			Graphics.end();
-		} else if (this instanceof FloorGrowing) {
-			((FloorGrowing)this).draw();
-		} else {
-			((Polygon)this).draw();
 		}
 		if (!frozen && animation != null) {
 			int width = getSprite().getRegionWidth();
@@ -446,16 +442,6 @@ public class Block extends Entity {
 			}
 		}
 		render(frozen);
-		if (this instanceof FloorGrowing) {
-			((FloorGrowing)this).grow(frozen);
-		}
-		if (this instanceof Chest) {
-			((Chest)this).drawItem();
-			((Chest)this).animate(frozen);
-		}
-		if (this instanceof DigitLock) {
-			((DigitLock)this).drawCombo(frozen);
-		}
 		drawBounds();
 	}
 	
@@ -485,7 +471,7 @@ public class Block extends Entity {
 	}
 	
 	public boolean equals(Object e) {
-		return super.equals(e) && type == ((Block)e).type && solid == ((Block)e).solid && rotation == ((Block)e).rotation;
+		return super.equals(e) && e instanceof Block && type == ((Block)e).type && solid == ((Block)e).solid && rotation == ((Block)e).rotation;
 	}
 	
 	
@@ -501,6 +487,10 @@ public class Block extends Entity {
 	
 	public static boolean openable(Keys key, boolean remove, int x) {
 		return key == null || Realms.getGame().gui().inventory().findKey(key, remove, x) || Realms.getGame().gui().inventory().findKey(Keys.CURSED, remove, x);
+	}
+	
+	public boolean isFillableChest() {
+		return this instanceof Chest && Blocks.Subtype.CHEST.variants.contains(type);
 	}
 	
 	public Block setShadows(float shadowA) {
@@ -524,7 +514,7 @@ public class Block extends Entity {
 			shadows[2][2] = new Entity(getX2(), getY() - 33, new TextureRegion(shadow, 33, 33, 33, 33));
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
-					if (shadows[i][j] != null && (shadows[i][j].getX() < 0 || shadows[i][j].getX() == 1440 || shadows[i][j].getY() < 0 || shadows[i][j].getY() == 790)) {
+					if (shadows[i][j] != null && (shadows[i][j].getX() < 0 || shadows[i][j].getX() == Realms.WIDTH || shadows[i][j].getY() < 0 || shadows[i][j].getY() == Realms.HEIGHT)) {
 						shadows[i][j] = null;
 					}
 				}
@@ -571,7 +561,6 @@ public class Block extends Entity {
 	
 	public void renderShadows() {
 		Graphics.setA(tint.a*shadowA);
-//		Graphics.setColor(new Color(1f, 1f, 1f, a*shadowA), true);
 		if (shadows != null) {
 			Graphics.begin();
 			for (int i = 0; i < 3; i++) {
@@ -655,12 +644,10 @@ public class Block extends Entity {
 	}
 	
 	public void setA(float a) {
-//		this.alpha = a;
 		tint.a = a;
 	}
 	
 	public float getA() {
-//		return alpha;
 		return tint.a;
 	}
 	
@@ -738,7 +725,7 @@ public class Block extends Entity {
 		}
 		
 		public static Block[] wrap(Block[] blocks, Style style, Blocks type) {
-			return wrap(new ArrayList<Block>(Arrays.asList(blocks)), style, type, 1440, 790).toArray(new Block[blocks.length]);
+			return wrap(new ArrayList<Block>(Arrays.asList(blocks)), style, type, Realms.WIDTH, Realms.HEIGHT).toArray(new Block[blocks.length]);
 		}
 		
 		public static ArrayList<Block> wrap(ArrayList<Block> blocks, Style style, Subtype type, int xMax, int yMax) {
@@ -932,6 +919,16 @@ public class Block extends Entity {
 				}
 			}
 			return blocks;
+		}
+		
+		public static boolean[][] toBoolGrid(int[][] grid) {
+			boolean[][] bool = new boolean[grid.length][grid[0].length];
+			for (int r = 0; r < grid.length; r++) {
+				for (int c = 0; c < grid[0].length; c++) {
+					bool[r][c] = grid[r][c] == 1 ? true : false;
+				}
+			}
+			return bool;
 		}
 		
 	}
