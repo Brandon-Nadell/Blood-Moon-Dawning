@@ -1,29 +1,6 @@
 package com.mygdx.game.entity;
 
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Vector2;
-import com.mygdx.game.Audio;
-import com.mygdx.game.Audio.Sounds;
-import com.mygdx.game.Statistics.StatType;
-import com.mygdx.game.Essence;
-import com.mygdx.game.Graphics;
-import com.mygdx.game.Loot;
-import com.mygdx.game.Realms;
-import com.mygdx.game.gui.HealthBar.Display;
-import com.mygdx.game.item.Item;
-import com.mygdx.game.item.gear.CombatGear;
-import com.mygdx.game.item.gear.Consumable;
-import com.mygdx.game.item.weapon.Bomb;
-import com.mygdx.game.item.weapon.Bomb.Ability;
-import com.mygdx.game.item.weapon.Crossbow;
-import com.mygdx.game.item.weapon.Dagger;
-import com.mygdx.game.item.weapon.Hammer;
 
 public abstract class MovingObject extends Entity {
 	
@@ -44,7 +21,6 @@ public abstract class MovingObject extends Entity {
 		this.group = group;
 		this.type = type;
 		forceMain = new Vector2((float)velX, (float)velY);
-//		forceMain = new Vector2((float)((int)(velX + .5)), (float)((int)(velY + .5)));
 		force = new Vector2();
 		lastPosition = new Vector2();
 		speed = velX;
@@ -126,7 +102,7 @@ public abstract class MovingObject extends Entity {
 		STONE_BONES(Color.GRAY, "Stone Bones", "creature/skel/stone_bones.png"),
 		LIGHTNING_HOSH(Color.YELLOW, "Lightning Hosh", "creature/skel/lightning_hosh.png"),
 		
-		KRAKEN(Color.ROYAL, null, Display.BOSS, "creature/kraken.png") {
+		KRAKEN(Color.ROYAL, "Akkryptid", Display.BOSS, "creature/kraken.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
 		KRAKEN_TENTACLE(Color.ROYAL, null, Display.NONE, "creature/red.png") {
@@ -136,37 +112,40 @@ public abstract class MovingObject extends Entity {
 				return null;
 			}
 		},
-		GOLEM(Color.GRAY, null, Display.BOSS, "creature/mightron.png") {
+		GOLEM(Color.GRAY, "Argent", Display.BOSS, "creature/mightron.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		ROGUE(Color.GRAY, null, Display.BOSS, "creature/necromanskull.png") {
+		ROGUE(Color.GRAY, "Skulk", Display.BOSS, "creature/necromanskull.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		DWELLER_BOSS(Color.FIREBRICK, null, Display.BOSS, "creature/rhineeose.png") {
+		DWELLER_BOSS(Color.FIREBRICK, "Dorf", Display.BOSS, "creature/rhineeose.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		MINOTAUR(Color.DARK_GRAY, null, Display.BOSS, "creature/bruiser.png") {
+		MINOTAUR(Color.DARK_GRAY, "Asterion", Display.BOSS, "creature/bruiser.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		FIRE_BOSS(Color.RED, null, Display.BOSS, "creature/knight_little.png") {
+		FIRE_BOSS(Color.RED, "Rhyla", Display.BOSS, "creature/knight_little.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		FLYNEST(Color.WHITE, null, Display.BOSS, "creature/fly1.png") {
+		FLYNEST(Color.WHITE, "Pterror", Display.BOSS, "creature/fly1.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		ICEBOSS(Color.WHITE, null, Display.BOSS, "creature/iceboss.png") {
+		ICEBOSS(Color.WHITE, "Nevee", Display.BOSS, "creature/iceboss.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		ICEBOSS_NOEYES(Color.WHITE, null, Display.BOSS, "creature/iceboss_noeyes.png") {
+		ICEBOSS_NOEYES(Color.WHITE, "Nevee", Display.BOSS, "creature/iceboss_noeyes.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		ARCHER_BOSS(Color.OLIVE, null, Display.BOSS, "creature/nastytacks.png") {
+		ARCHER_BOSS(Color.OLIVE, "Ghuill", Display.BOSS, "creature/nastytacks.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
 		SHADOW_BOSS(Color.WHITE, null, Display.BOSS, "creature/creep.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		NINJA_BOSS(Color.WHITE, null, Display.BOSS, "creature/creep.png") {
+		NINJA_BOSS(Color.WHITE, "Thaum", Display.BOSS, "creature/creep.png") {
+			public void kill(Creature creature) { killBoss(creature); }
+		},
+		SKELETON_BOSS(Color.WHITE, "Soulcrier", Display.BOSS, "creature/creep.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
 		IDOL_BOSS(Color.RED, null, Display.BOSS, "creature/alfoid.png") {
@@ -175,37 +154,34 @@ public abstract class MovingObject extends Entity {
 		TRASH_BOSS(Color.GRAY, null, Display.BOSS, "block/material/metal.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		ZOMBIE_BOSS(Color.TEAL, null, Display.BOSS, "creature/zombie1.png") {
+		ZOMBIE_BOSS(Color.TEAL, "Metem", Display.BOSS, "creature/zombie1.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		BASILISK(Color.OLIVE, null, Display.BOSS, "creature/box.png") {
+		BASILISK(Color.OLIVE, "Cyralisk", Display.BOSS, "creature/box.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		SAND_BOSS(Color.GOLD, null, Display.BOSS, "creature/sand_boss.png") {
+		SAND_BOSS(Color.GOLD, "Scaraner", Display.BOSS, "creature/sand_boss.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		MIRROR_BOSS(Color.DARK_GRAY, null, Display.BOSS, "creature/mirror.png") {
+		ROCK_BOSS(Color.GRAY, "Boultron", Display.BOSS, "creature/mightron.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		ROCK_BOSS(Color.GRAY, null, Display.BOSS, "creature/mightron.png") {
+		ELETRIC_BOSS(Color.GRAY, "Lutron", Display.BOSS, "creature/lutron.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		ELETRIC_BOSS(Color.GRAY, null, Display.BOSS, "creature/lutron.png") {
+		ZOMBIE_FIRE_BOSS(Color.GRAY, "Blaze Metem", Display.BOSS, "creature/zombie_fire.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		ZOMBIE_FIRE_BOSS(Color.GRAY, null, Display.BOSS, "creature/zombie_fire.png") {
+		SPECTRESS_BOSS(Color.GOLD, "Helixir", Display.BOSS, "creature/skel/evoron.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		SPECTRESS_BOSS(Color.GOLD, null, Display.BOSS, "creature/skel/evoron.png") {
+		PURPLE_POISON_BOSS(Color.PURPLE, "Gurglar", Display.BOSS, "creature/nastytacks.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		PURPLE_POISON_BOSS(Color.PURPLE, null, Display.BOSS, "creature/nastytacks.png") {
+		EYE_LASER_BOSS(Color.RED, "Psycheye", Display.BOSS, "creature/blank.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
-		EYE_LASER_BOSS(Color.RED, null, Display.BOSS, "creature/blank.png") {
-			public void kill(Creature creature) { killBoss(creature); }
-		},
-		LICH_BOSS(Color.RED, null, Display.BOSS, "creature/skel/evoron.png") {
+		LICH_BOSS(Color.RED, "Vex", Display.BOSS, "creature/skel/evoron.png") {
 			public void kill(Creature creature) { killBoss(creature); }
 		},
 		SLOTH(Color.SLATE, null, Display.BOSS, "creature/sloth.png") {
@@ -392,7 +368,19 @@ public abstract class MovingObject extends Entity {
 			public Texture getTexture(CombatGear item) {
 				return ((Consumable)item).getColor().texture;
 			}
-			//type == MovingObjects.POTION ? ((Consumable)drop).getColor().texture : type == MovingObjects.BOMB ? ((Bomb)drop).getBomb().texture : type == MovingObjects.BOLT ? ((Crossbow)drop).getBolt() : type.texture[0]
+		},
+		CUSTOM {
+			public void collideBlock(Projectile projectile, Block block) { 
+				if (block instanceof ModBlock) {
+					((ModBlock)block).effect(projectile);
+				} else if (block.getSolid()) {
+					drop(projectile, block);
+				}
+			}
+			
+			public Texture getTexture(CombatGear item) {
+				return item.getItem().texture;
+			}
 		},
 		
 		BOX("creature/box.png"),
@@ -420,7 +408,6 @@ public abstract class MovingObject extends Entity {
 			for (int i = 0 ; i < this.textures.length; i++) {
 				this.textures[i] = Realms.divideIntoFour(this.texture[i]);
 			}
-//			this.textures = Realms.divideIntoFour(texture);
 			this.color = color;
 			this.name = name;
 			this.display = display;
@@ -483,10 +470,9 @@ public abstract class MovingObject extends Entity {
 			public MovingObjects random() {
 				MovingObjects mo;
 				do {
-					mo = Realms.random(MovingObjects.values());
+					mo = Realms.random(list);
 				} while (mo.color == null || mo.name == null);
 				return mo;
-//				return list.get((int)(Math.random()*list.size()));
 			}
 		}
 		
@@ -530,7 +516,6 @@ public abstract class MovingObject extends Entity {
 	
 	public static boolean nearZero(float value, float friction) {
 		return Math.abs(value) < friction;
-//		return (0 < value && 0 > value - friction) || (0 > value && 0 < value + friction);
 	}
 	
 	public void unCollideAll() {
@@ -657,7 +642,7 @@ public abstract class MovingObject extends Entity {
 		if (Realms.getGame().getBounds()) {
 			Graphics.shapeRenderer.begin(ShapeType.Line);
 			Graphics.rect(getX(), getY(), getWidth(), getHeight());
-			Graphics.shapeRenderer.rectLine(centerX(), centerY(), centerX() + (int)(sumVelX()*10), centerY() + (int)(sumVelY()*10), 3);
+			Graphics.rectLine(centerX(), centerY(), centerX() + (int)(sumVelX()*10), centerY() + (int)(sumVelY()*10), 3);
 			Graphics.shapeRenderer.end();
 		}
 	}
@@ -675,6 +660,21 @@ public abstract class MovingObject extends Entity {
 			Realms.getGame().getPlayer().getAnim().worsenSpecial(timeChange.cpy());
 		}
 		this.gameSpeed = gameSpeed;
+	}
+	
+	public static void pull(Room room, MovingObject puller, int strength, boolean unCollide) {
+		for (Creature creature : room.getCreatures2()) {
+			if (creature.getGroup() != puller.getGroup()) {
+				Vector2 v = Realms.angleVector(puller, creature);
+				creature.changeX(v.x*strength);
+				creature.changeY(v.y*strength);
+			}
+		}
+		if (unCollide) {
+			if (Realms.getGame().getPlayer().touching(puller)) {
+				Realms.getGame().getPlayer().unCollide(puller);
+			}
+		}
 	}
 	
 	
